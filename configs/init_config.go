@@ -8,8 +8,14 @@ import (
 )
 
 func InitConfigs() (AppConfigs, error) {
-	if err := godotenv.Load(".env"); err != nil {
-		return AppConfigs{}, fmt.Errorf("error loading .env file: %w", err)
+	if os.Getenv("LOCAL") == "true" {
+		if err := godotenv.Load(".env.local"); err != nil {
+			return AppConfigs{}, fmt.Errorf("error loading .env.local file: %w", err)
+		}
+	} else {
+		if err := godotenv.Load(".env"); err != nil {
+			return AppConfigs{}, fmt.Errorf("error loading .env file: %w", err)
+		}
 	}
 
 	postgres, err := loadPostgresConfig()

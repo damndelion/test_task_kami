@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_DB: kami_test
+      POSTGRES_USER: kami_user
+      POSTGRES_PASSWORD: super_secret_password
+    ports:
+        - "5432:5432"
+    volumes:
+      - test_task_kami_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  app:
+    image: test_task_kami:latest
+    container_name: kami
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+
+
+volumes:
+  test_task_kami_db_data:
+
+networks:
+  app-network:
+    driver: bridge

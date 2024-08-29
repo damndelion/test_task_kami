@@ -20,7 +20,14 @@ swag: ### swagger init
 .PHONY: swag
 
 
+docker-build: ### build app in docker
+	docker build -t test_task_kami:latest -f Dockerfile .
+.PHONY: docker-build
 
+
+compose-up: ### build app in docker
+	docker-compose up
+.PHONY: compose-up
 
 
 
