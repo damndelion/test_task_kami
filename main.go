@@ -40,7 +40,7 @@ func main() {
 	// Connect to DB
 	db, err := database.NewPostgresDB(config.Postgres)
 	if err != nil {
-		logs.Named("database").Info("error with loading config: %s", err.Error())
+		logs.Named("database").Fatalf("error with loading config: %s", err.Error())
 		return
 	}
 	logs.Named("database").Info("connection with database is established")

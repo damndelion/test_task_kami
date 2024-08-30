@@ -55,6 +55,10 @@ func (h *Handler) CreateReservation(w http.ResponseWriter, r *http.Request) {
 			h.logs.Warnf("failed to create reservation: %v", err)
 			http.Error(w, "time slot already booked", http.StatusConflict)
 			return
+		} else if errors.Is(err, customrErrors.ErrEndBeforeStart) {
+			h.logs.Warnf("failed to create reservation: %v", err)
+			http.Error(w, "start time must be before end time", http.StatusBadRequest)
+			return
 		}
 		h.logs.Errorf("failed to create reservation: %v", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -87,6 +91,9 @@ func (h *Handler) GetReservationsByRoomID(w http.ResponseWriter, r *http.Request
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 
 		return
+	}
+	if len(reservations) == 0 {
+		http.Error(w, "no reservations found", http.StatusNotFound)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

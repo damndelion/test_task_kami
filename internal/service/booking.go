@@ -37,6 +37,10 @@ func (s *BookingService) CreateReservation(ctx context.Context, input models.Boo
 	if err != nil {
 		return 0, fmt.Errorf("invalid end time format: %w", err)
 	}
+	if startTime.After(endTime) {
+		return 0, customrErrors.ErrEndBeforeStart
+	}
+
 	booking := models.Booking{
 		RoomID:    input.RoomID,
 		StartTime: startTime,

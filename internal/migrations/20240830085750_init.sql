@@ -12,7 +12,6 @@ CREATE TABLE bookings (
                           room_id text NOT NULL,
                           start_time TIMESTAMP NOT NULL,
                           end_time TIMESTAMP NOT NULL,
-                          CONSTRAINT end_gt_start CHECK (end_time > start_time),
                           CONSTRAINT fk_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
