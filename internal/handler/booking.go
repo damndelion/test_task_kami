@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"github.com/damndelion/test_task_kami/internal/customrErrors"
 	"github.com/damndelion/test_task_kami/internal/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
@@ -30,7 +31,6 @@ func (h *Handler) BookingRoutes() chi.Router {
 //	@Router			/api/v1/bookings [post]
 func (h *Handler) CreateReservation(w http.ResponseWriter, r *http.Request) {
 	var input models.BookingCreate
-
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		h.logs.Errorf("failed to decode request body: %v", err)
 		http.Error(w, "invalid input", http.StatusBadRequest)
@@ -51,6 +51,11 @@ func (h *Handler) CreateReservation(w http.ResponseWriter, r *http.Request) {
 
 	id, err := h.service.CreateReservation(r.Context(), input)
 	if err != nil {
+		if errors.Is(err, customrErrors.ErrAlreadyBooked) {
+			h.logs.Warnf("failed to create reservation: %v", err)
+			http.Error(w, "time slot already booked", http.StatusConflict)
+			return
+		}
 		h.logs.Errorf("failed to create reservation: %v", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
@@ -58,7 +63,7 @@ func (h *Handler) CreateReservation(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(map[string]int{"id": id}); err != nil {
+	if err = json.NewEncoder(w).Encode(map[string]int{"id": id}); err != nil {
 		h.logs.Errorf("failed to encode response: %v", err)
 	}
 }

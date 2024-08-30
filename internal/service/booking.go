@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/damndelion/test_task_kami/internal/customrErrors"
 	"github.com/damndelion/test_task_kami/internal/models"
 	"github.com/damndelion/test_task_kami/internal/repository"
 	"go.uber.org/zap"
+	"time"
 )
 
 type IBookingService interface {
@@ -26,10 +28,36 @@ func NewBookingService(logs *zap.SugaredLogger, repo repository.IBookingRepo) IB
 }
 
 func (s *BookingService) CreateReservation(ctx context.Context, input models.BookingCreate) (int, error) {
-	id, err := s.repo.CreateReservation(ctx, input)
+	//prepare data
+	startTime, err := time.Parse("2006-01-02-15:04:05", input.StartTime)
 	if err != nil {
-		s.logs.Named("booking").Errorf("booking  - repo - CreateReservation - failed to create reservation: %v", err)
-		return 0, fmt.Errorf("booking  - repo - CreateReservation - failed to create reservation: %w", err)
+		return 0, fmt.Errorf("invalid start time format: %w", err)
+	}
+	endTime, err := time.Parse("2006-01-02-15:04:05", input.EndTime)
+	if err != nil {
+		return 0, fmt.Errorf("invalid end time format: %w", err)
+	}
+	booking := models.Booking{
+		RoomID:    input.RoomID,
+		StartTime: startTime,
+		EndTime:   endTime,
+	}
+
+	//check for overlapping
+	overlapping, err := s.repo.CheckOverlappingReservation(ctx, booking.RoomID, booking.StartTime, booking.EndTime)
+	if err != nil {
+		s.logs.Named("booking").Errorf("booking - service - CheckOverlappingReservation - failed: %v", err)
+		return 0, fmt.Errorf("booking - service - CheckOverlappingReservation - failed: %w", err)
+	}
+	if overlapping {
+		return 0, customrErrors.ErrAlreadyBooked
+	}
+
+	// create reservation
+	id, err := s.repo.CreateReservation(ctx, booking)
+	if err != nil {
+		s.logs.Named("booking").Errorf("booking - repo - CreateReservation - failed to create reservation: %v", err)
+		return 0, fmt.Errorf("booking - repo - CreateReservation - failed to create reservation: %w", err)
 	}
 
 	return id, nil

@@ -17,9 +17,8 @@ type BookingDTO struct {
 	StartTime time.Time `json:"start_time"`
 	EndTime   time.Time `json:"end_time"`
 }
-
 type BookingCreate struct {
 	RoomID    string `json:"room_id" validate:"required"`
-	StartTime string `json:"start_time" validate:"required,datetime=2006-01-02-15:04:05"` // YYYY-MM-DD-hh:mm:ss format
-	EndTime   string `json:"end_time" validate:"required,datetime=2006-01-02-15:04:05"`   // YYYY-MM-DD-hh:mm:ss format
+	StartTime string `json:"start_time" validate:"required,datetime=2006-01-02-15:04:05"` //  YYYY-MM-DD HH:MM:SS
+	EndTime   string `json:"end_time" validate:"required,datetime=2006-01-02-15:04:05"`   //  YYYY-MM-DD HH:MM:SS
 }

@@ -20,8 +20,9 @@ type Handler struct {
 
 func NewHandler(logs *zap.SugaredLogger, service *service.Service) *Handler {
 	return &Handler{
-		logs:    logs,
-		service: service,
+		logs:     logs,
+		service:  service,
+		validate: validator.New(),
 	}
 }
 
