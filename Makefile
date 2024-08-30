@@ -30,5 +30,23 @@ compose-up: ### build app in docker
 .PHONY: compose-up
 
 
+migration-up: ### migration up
+	@source .env.local && \
+	DB_URL="postgresql://$${DB_USERNAME}:$${DB_PASSWORD}@$${DB_HOST}:$${DB_PORT}/$${DB_NAME}?sslmode=$${DB_SSL_MODE}" && \
+	goose -dir internal/migrations postgres "$$DB_URL" up
+.PHONY: migration-up
+
+migration-down: ### migration down
+	@source .env.local && \
+	DB_URL="postgresql://$${DB_USERNAME}:$${DB_PASSWORD}@$${DB_HOST}:$${DB_PORT}/$${DB_NAME}?sslmode=$${DB_SSL_MODE}" && \
+	goose -dir internal/migrations postgres "$$DB_URL" down
+.PHONY: migration-down
+
+migration-create:
+	goose -dir internal/migrations create $(name) sql
+.PHONY: migration-create
+
+
+
 
 

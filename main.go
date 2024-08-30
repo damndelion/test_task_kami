@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/damndelion/test_task_kami/configs"
+	_ "github.com/damndelion/test_task_kami/docs"
 	"github.com/damndelion/test_task_kami/internal/handler"
 	"github.com/damndelion/test_task_kami/internal/infrastructure/database"
 	"github.com/damndelion/test_task_kami/internal/infrastructure/logger"
@@ -17,6 +18,12 @@ import (
 	"github.com/damndelion/test_task_kami/internal/service"
 )
 
+//	@title			test_task_kami
+//	@version		1.0
+//	@description	API Server for test_task_kami
+
+// @host		localhost:8080
+// @BasePath	/
 func main() {
 	// Read configs
 	config, err := configs.InitConfigs()
@@ -40,7 +47,7 @@ func main() {
 
 	repo := repository.NewRepository(db)
 
-	useCase := service.NewService(repo)
+	useCase := service.NewService(logs, repo)
 
 	handlers := handler.NewHandler(logs, useCase)
 	srv := new(server.Server)
