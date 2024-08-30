@@ -46,7 +46,9 @@ migration-create:
 	goose -dir internal/migrations create $(name) sql
 .PHONY: migration-create
 
-
+test:
+	 cd internal/handler && go test -v
+.PHONY: test
 
 
 
