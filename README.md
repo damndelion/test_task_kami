@@ -54,4 +54,5 @@ make test
 
 
 ### 4. Database schema 
+<img width="624" alt="Снимок экрана 2024-08-30 в 17 49 08" src="https://github.com/user-attachments/assets/5e2adcee-59b1-4158-9ee8-6c2892482048">
 
